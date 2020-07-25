@@ -1,0 +1,21 @@
+{
+  "name": "server-logic",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx mocha logic"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.0.1"
+  },
+  "dependencies": {
+    "data": "file:../data",
+    "dotenv": "^8.2.0",
+    "utils": "file:../utils"
+  }
+}
