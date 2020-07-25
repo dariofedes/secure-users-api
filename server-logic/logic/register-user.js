@@ -1,3 +1,6 @@
+require('dotenv').config()
+const { env: { BCRYPT_SALT_ROUNDS } } = process
+const bcrypt = require('bcrypt')
 const { models: { User } } = require('data')
 const { validate } = require('utils')
 const { sanitize } = require('../utils')
@@ -29,11 +32,10 @@ module.exports = (username, email, password) => {
             }
         } while(user)
 
-
         user = new User({
             email,
             username,
-            password
+            password: await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS))
         })
         
         return sanitize(await user.save())

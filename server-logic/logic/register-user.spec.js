@@ -46,6 +46,14 @@ describe('registerUser', () => {
                 expect(registeredUser.email).to.equal(email)
                 expect(registeredUser.username).to.equal(username)
             })        
+
+            it('should encrypt the password', async () => {
+                const registeredUser = await registerUser(username, email, password)
+
+                const { password: encryptedPassword } = await User.findById(registeredUser.id)
+
+                expect(encryptedPassword).not.to.equal(password)
+            })
         })
     
         describe('on existing user', () => {

@@ -1,5 +1,6 @@
 require('dotenv').config()
-const { env: { DB_URL_TEST } } = process
+const { env: { DB_URL_TEST, BCRYPT_SALT_ROUNDS } } = process
+const bcrypt = require('bcrypt')
 const { mongoose, models: { User } } = require('data')
 const authenticateUser = require('./authenticate-user')
 const { expect } = require('chai')
@@ -13,19 +14,36 @@ describe('authenticateUser', () => {
     })
 
     describe('on valid fields', async () => {
-        beforeEach(() => {
+        beforeEach(async () => {
+            const email = `email-${Math.random()}@email.com`
+            const username =  `username-${Math.random()}`
+            const password =  `password-${Math.random()}`
+
             user = new User({
-                email: `email-${Math.random()}@email.com`,
-                username: `username-${Math.random()}`,
-                password: `password-${Math.random()}`
+                email,
+                username,
+                password: await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS))
             })
 
-            user.save()
-
+            
             authUser = {
-                email: user.email,
-                password: user.password
+                email,
+                password
             }
+
+            await user.save()
+        })
+
+        it('should work fine with encrypted passwords from the database', async () => {
+            let _error
+
+            try{
+                await authenticateUser(authUser.email, authUser.password)
+            } catch(error) {
+                _error = error
+            }
+
+            expect(_error).not.to.exist
         })
 
         it('should return the user on success', async () => {
@@ -63,7 +81,7 @@ describe('authenticateUser', () => {
                 expect(error).to.be.an.instanceof(Error)
                 expect(error.message).to.equal('wrong credentials')
             }
-        }) 
+        })
      })
 
      describe('on wrong fields', async () => {

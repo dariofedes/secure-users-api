@@ -6,7 +6,6 @@ const { mongoose } = require('data')
 const schema = require('./gql/schema')
 const cors = require('cors');
 
-debugger
 
 (async ()=> {
     await mongoose.connect(DB_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }, () => console.log('Connected to Database'))
