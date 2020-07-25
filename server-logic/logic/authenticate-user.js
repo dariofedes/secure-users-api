@@ -1,5 +1,6 @@
 const { models: { User } } = require('data')
 const { validate } = require('utils')
+const { sanitize } = require('../utils')
 
 module.exports =  (email, password) => {
     validate.email(email)
@@ -10,6 +11,6 @@ module.exports =  (email, password) => {
         
         if(!user) throw new Error('wrong credentials')
 
-        return user
+        return sanitize(user)
     })()
 }

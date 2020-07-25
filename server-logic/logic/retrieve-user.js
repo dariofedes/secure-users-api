@@ -1,5 +1,6 @@
 const { models: { User } } = require('data')
 const { validate } = require('utils')
+const { sanitize } = require('../utils')
 
 module.exports = (id) => {
     validate.string(id, 'id')
@@ -8,6 +9,6 @@ module.exports = (id) => {
         let user = await User.findById(id)
         if(!user)throw new Error(`user with id ${id} does not exist`)
 
-        return user
+        return sanitize(user)
     })()
 }

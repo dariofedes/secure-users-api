@@ -35,6 +35,14 @@ describe('authenticateUser', () => {
             expect(id).to.equal(registeredUser.id)
         })
 
+        it('should not expose the database', async () => {
+            const user = await authenticateUser(authUser.email, authUser.password)
+
+            expect(user.__v).not.to.exist
+            expect(user._id).not.to.exist
+            expect(user._doc).not.to.exist
+        })
+
         it('should fail on wrong password and valid email', async () => {
             authUser.password = `wrong${authUser.password}`
 

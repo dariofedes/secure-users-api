@@ -32,6 +32,14 @@ describe('registerUser', () => {
                 expect(_error).not.to.exist
             })
     
+            it('should not expose the database', async () => {
+                const user = await registerUser(username, email, password)
+                expect(user.__v).not.to.exist
+                expect(user._id).not.to.exist
+                expect(user._doc).not.to.exist
+            })
+    
+    
             it('should save the right user data', async () => {
                 const registeredUser = await registerUser(username, email, password)
     

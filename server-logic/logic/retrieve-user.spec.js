@@ -31,6 +31,20 @@ describe('retrieveUser', () => {
             expect(retrievedUser.email).to.equal(user.email)
             expect(retrievedUser.username).to.equal(user.username)
         })
+
+        it('should not return the users\' password', async () => {
+            const retrievedUser = await retrieveUser(id)
+
+            expect(retrievedUser.password).not.to.exist
+        })
+
+        it('should not expose the database', async () => {
+            const retrievedUser = await retrieveUser(id)
+
+            expect(retrievedUser._id).not.to.exist
+            expect(retrievedUser._doc).not.to.exist
+            expect(retrievedUser.__v).not.to.exist
+        })
     })
     
     describe('on wrong fields', () => {

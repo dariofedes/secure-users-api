@@ -1,5 +1,6 @@
 const { models: { User } } = require('data')
 const { validate } = require('utils')
+const { sanitize } = require('../utils')
 
 module.exports = (username, email, password) => {
     validate.string(username, 'username')
@@ -35,6 +36,6 @@ module.exports = (username, email, password) => {
             password
         })
         
-        return await user.save()
+        return sanitize(await user.save())
     })()
 }
