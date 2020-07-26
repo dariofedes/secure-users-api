@@ -1,22 +1,26 @@
 {
   "name": "server-logic",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx mocha logic"
+    "test": "mocha __tests__ --timeout 10000",
+    "coverage" : "nyc npm run test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^8.0.1"
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
     "data": "file:../data",
     "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.4.10",
     "utils": "file:../utils"
   }
 }

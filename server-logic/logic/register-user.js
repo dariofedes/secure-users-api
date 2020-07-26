@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const { models: { User } } = require('data')
 const { validate } = require('utils')
 const { sanitize } = require('../utils')
+const { sendVerificationEmail } = require('../utils')
 
 module.exports = (username, email, password) => {
     validate.string(username, 'username')
@@ -13,7 +14,11 @@ module.exports = (username, email, password) => {
     return (async () => {
         // Preventing duplicated accounts
         let user = await User.findOne({ email })
-        if(user) throw new Error (`email ${email} is already in use`)
+        if(user) {
+            if(!user.verifyed) await sendVerificationEmail(email, user.id, user.verificationCode)
+
+            throw new Error (`Email ${email} is already in use. Please login or check your email and verify your account`)
+        }
 
         // Preventing repeated usernames
         let usernameCounter = 1
@@ -32,12 +37,19 @@ module.exports = (username, email, password) => {
             }
         } while(user)
 
+        const verificationCode = Math.floor(Math.random() * 100000).toString()
+
         user = new User({
             email,
             username,
-            password: await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS))
+            password: await bcrypt.hash(password, parseInt(BCRYPT_SALT_ROUNDS)),
+            verificationCode
         })
         
-        return sanitize(await user.save())
+        const registeredUser = await user.save()
+        
+        await sendVerificationEmail(email, registeredUser.id, verificationCode)
+
+        return sanitize(registeredUser)
     })()
 }

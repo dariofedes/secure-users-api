@@ -19,3 +19,7 @@ We use the `sanitize()` function to remove the password and MongoDB metadata fro
 ## 1.2.0
 
 Until now, users' passwords were stored in the database unencrypted, which compromised our users' accounts in the event of an attack that exposed the database. We now use [`bcrypt`](https://www.npmjs.com/package/bcrypt) to store passwords securely encrypted.
+
+## 2.0.0
+
+Until now, our API was relatively secure, but it was vulnerable to attackers creating fake user accounts in bulk. We now perform email verification before allowing the user to authenticate or allow other users to request the user information.

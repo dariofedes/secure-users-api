@@ -17,9 +17,9 @@ module.exports = new GraphQLObjectType({
             async resolve(parent, args, context) {
                 const { headers: { authorization } } = context
                 const [ , token] = authorization.split(' ')
-                await jwt.verify(token, JWT_SECRET)
+                const { sub: retrieverId } = await jwt.verify(token, JWT_SECRET)
 
-                return await retrieveUser(args.id)
+                return await retrieveUser(args.id, retrieverId)
             }
         }
     }

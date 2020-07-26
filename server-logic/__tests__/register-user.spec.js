@@ -1,8 +1,9 @@
 require('dotenv').config()
 const { env: { DB_URL_TEST } } = process
-const { mongoose, models: { User } } = require('data')
-const registerUser = require('./register-user')
+const bcrypt = require('bcrypt')
 const { expect } = require('chai')
+const { mongoose, models: { User } } = require('data')
+const registerUser = require('../logic/register-user')
 
 describe('registerUser', () => {
     let email, username, password
@@ -31,6 +32,19 @@ describe('registerUser', () => {
     
                 expect(_error).not.to.exist
             })
+
+            it('should not fail on existing username', async () => {
+                let _error
+                email = `new-${email}`
+                try {
+                        await registerUser(username, email, password)
+        
+                } catch(error) {
+                    _error = error
+                }
+
+                expect(_error).not.to.exist
+            })
     
             it('should not expose the database', async () => {
                 const user = await registerUser(username, email, password)
@@ -45,7 +59,23 @@ describe('registerUser', () => {
     
                 expect(registeredUser.email).to.equal(email)
                 expect(registeredUser.username).to.equal(username)
-            })        
+            })
+
+            it('should change the username on existing username', async () => {
+                await User.create({username, email, password})
+
+                const firstSameUsername = await registerUser(username, `firstDifferent-${email}`, password)
+
+                expect(firstSameUsername.username).not.to.equal(username)
+                expect(firstSameUsername.username.length).to.equal(username.length + 1)
+
+                const secondSameUsername = await registerUser(username, `secondDifferent-${email}`, password)
+
+                expect(secondSameUsername.username).not.to.equal(username)
+                expect(secondSameUsername.username).not.to.equal(firstSameUsername.username)
+                expect(secondSameUsername.username.length).to.equal(username.length + 1)
+                expect(secondSameUsername.username.length).to.equal(firstSameUsername.username.length)
+            })
 
             it('should encrypt the password', async () => {
                 const registeredUser = await registerUser(username, email, password)
@@ -53,6 +83,36 @@ describe('registerUser', () => {
                 const { password: encryptedPassword } = await User.findById(registeredUser.id)
 
                 expect(encryptedPassword).not.to.equal(password)
+
+                let _error
+
+                try {
+                    const successfullyEncryptedPassword = await bcrypt.compare(password, encryptedPassword)
+
+                    expect(successfullyEncryptedPassword).to.be.true
+                } catch(error) {
+                    _error = error
+                }
+
+                expect(_error).not.to.exist
+                
+            })
+
+            it('should create the user as not verifyed by default', async () => {
+                const { id } = await registerUser(username, email, password)
+
+                const registeredUser = await User.findById(id)
+    
+                expect(registeredUser.verifyed).to.be.false
+            })
+
+            it('should create the user with a verification code', async () => {
+                const { id } = await registerUser(username, email, password)
+
+                const registeredUser = await User.findById(id)
+    
+                expect(registeredUser.verificationCode).to.exist
+                expect(registeredUser.verificationCode).to.be.a('string')
             })
         })
     
@@ -67,28 +127,22 @@ describe('registerUser', () => {
                 await user.save()
             })
     
-            it('should fail on existing username', async () => {
-                email = `new-${email}`
-                try {
-                        await registerUser(username, email, password)
-        
-                } catch(error) {
-                    expect(error).to.be.an.instanceof(Error)
-                    expect(error.message).to.equal(`username ${username} is already in use`)
-                }
-            })
     
             it('should fail on existing email', async () => {
-                username = `new-${username}`
+                let _error
                 try {
                     
                         await registerUser(username, email, password)
                     
         
                 } catch(error) {
+                    _error = error
+
                     expect(error).to.be.an.instanceof(Error)
-                    expect(error.message).to.equal(`email ${email} is already in use`)
+                    expect(error.message).to.equal(`Email ${email} is already in use. Please login or check your email and verify your account`)
                 }
+
+                expect(_error).to.exist
             })
         })
     })

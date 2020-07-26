@@ -180,3 +180,4 @@ $RECYCLE.BIN/
 
 package-lock.json
 yarn.lock
+mailer.config.js
