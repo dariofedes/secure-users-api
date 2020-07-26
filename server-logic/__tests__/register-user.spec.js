@@ -128,21 +128,18 @@ describe('registerUser', () => {
             })
     
     
-            it('should fail on existing email', async () => {
+            it('should not fail on existing email', async () => {
                 let _error
                 try {
                     
-                        await registerUser(username, email, password)
+                        await registerUser(username, email, password, 'fake:ip')
                     
         
                 } catch(error) {
                     _error = error
-
-                    expect(error).to.be.an.instanceof(Error)
-                    expect(error.message).to.equal(`Email ${email} is already in use. Please login or check your email and verify your account`)
                 }
 
-                expect(_error).to.exist
+                expect(_error).not.to.exist
             })
         })
     })

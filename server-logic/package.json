@@ -1,11 +1,11 @@
 {
   "name": "server-logic",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "mocha __tests__ --timeout 10000",
-    "coverage" : "nyc npm run test"
+    "coverage": "nyc npm run test"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "data": "file:../data",
     "dotenv": "^8.2.0",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.27.0",
     "nodemailer": "^6.4.10",
     "utils": "file:../utils"
   }

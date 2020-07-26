@@ -15,18 +15,21 @@ module.exports = new GraphQLObjectType({
     name: 'RootMutationType',
     fields: {
         registerUser: {
-            type: UserType,
+            type: GraphQLString,
             args: {
                 username: { type: GraphQLString },
                 email: { type: GraphQLString },
                 password: { type: GraphQLString },
             },
-            async resolve(parent, args) {
+            async resolve(parent, args, context) {
                 const { username, email, password } = args
 
-                const user = await registerUser(username, email, password)
+                await registerUser(username, email, password, context.ip)
 
-                return user
+
+                // This endpoint always retruns the same feedback to the client
+
+                return 'Check your email, we sent you an activation link.'
             }
         },
         authenticateUser: {
